@@ -2,6 +2,8 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Baby, Coffee, MapPin, Users, Menu, X, Milk, Accessibility, Sparkles, Armchair, Droplets, ShieldAlert } from 'lucide-react';
 import './styles.css';
+import logo from './assets/logo.png';
+import logo100 from './assets/logo100.png';
 
 const guidePlaces = [
   {
@@ -43,8 +45,7 @@ function Header() {
   return (
     <header className="site-header">
       <a className="brand" href="#top" aria-label="Coffee With Dad home">
-        <span className="brand-mark">☕</span>
-        <span>Coffee With Dad</span>
+        <img src={logo100} alt="Coffee With Dad" className="brand-logo" />
       </a>
       <button className="menu-button" onClick={() => setOpen(!open)} aria-label="Toggle menu">
         {open ? <X size={22} /> : <Menu size={22} />}
@@ -69,11 +70,12 @@ function Hero() {
         </div>
         <p className="small-note">No memberships. No fees. No weird organisation energy.</p>
       </div>
-      <div className="hero-card" aria-label="Parent survival card">
-        <Coffee size={42} />
-        <h2>Parent survival level</h2>
-        <p>Cold coffee accepted. Hot coffee admired from a distance.</p>
-        <div className="survival-meter"><span /></div>
+      <div className="hero-image">
+        <img
+          src={logo}
+          alt="Coffee With Dad"
+          className="hero-logo"
+        />
       </div>
     </section>
   );
@@ -235,7 +237,7 @@ function App() {
       </main>
       <footer className="footer">
         <span>Coffee With Dad - Shrewsbury</span>
-        <span>No coffee was consumed hot in the making of this website.</span>
+        <span>Made with love, a baby sick stained shirt and minimum coffee.</span>
       </footer>
     </>
   );

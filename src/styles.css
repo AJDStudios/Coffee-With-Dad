@@ -76,6 +76,11 @@ p { color: var(--muted); line-height: 1.65; }
   padding: 5rem 0 3rem;
 }
 
+.hero-logo {
+  width: 580px;
+  height: auto;
+}
+
 .eyebrow {
   text-transform: uppercase;
   font-size: 0.78rem;
