@@ -7,35 +7,7 @@ import logo100 from './assets/logo100.png';
 import dad from './assets/dad.jpg';
 import host from './assets/host.png';
 import son from './assets/vanya.jpeg';
-
-
-const guidePlaces = [
-  {
-    name: 'Darwin Centre Costa',
-    area: 'Darwin Shopping Centre',
-    summary: 'A dependable infant-mode stop: easy pram access, useful facilities, and staff who handle parent chaos well.',
-    facilities: {
-      toilets: '1 standard + 1 accessible',
-      changing: '1 in-store, backup downstairs in the centre',
-      highChairs: 'Around 3',
-      hotWater: 'Provided happily, without fuss',
-    },
-    ratings: [
-      { icon: '🚼', label: 'Pram Access', status: 'green', title: 'Roll in like you own the place', note: 'Mostly straightforward. A few spots may require someone to shift a chair.' },
-      { icon: '👶', label: 'Changing Facilities', status: 'green', title: 'Staff would roll up their sleeves', note: 'Stable and usable. Bring a cover, because you are still a parent with standards.' },
-      { icon: '🍼', label: 'Bottle Support', status: 'green', title: 'Happy to help', note: 'Hot water available without question.' },
-      { icon: '🤱', label: 'Breastfeeding Comfort', status: 'green', title: 'No one bats an eye', note: 'Not uncommon, and not treated as a spectacle.' },
-      { icon: '👥', label: 'Customer Tolerance', status: 'green', title: 'Life continues', note: 'High tolerance. Baby noise does not seem to bother regulars much.' },
-      { icon: '🚨', label: 'Emergency Parent Score', status: 'green', title: "You've got this", note: 'If you need a change, feed, toilet and coffee, this is serviceable.' },
-    ],
-  },
-];
-
-const trafficLegend = [
-  ['green', 'Yes', 'No planning spiral required.'],
-  ['yellow', 'With planning / help', 'Possible, but think before entering.'],
-  ['red', 'No chance', 'Technically possible does not count.'],
-];
+import guidePlaces from './data/guidePlaces';
 
 function Header() {
   const [open, setOpen] = React.useState(false);
@@ -124,41 +96,83 @@ function InfoCard({ icon, title, text }) {
 }
 
 function Guide() {
-  const place = guidePlaces[0];
+  const [activeIndex, setActiveIndex] = React.useState(0);
+  const place = guidePlaces[activeIndex];
+
+  const nextPlace = () => {
+    setActiveIndex((current) => (current + 1) % guidePlaces.length);
+  };
+
+  const previousPlace = () => {
+    setActiveIndex((current) =>
+      current === 0 ? guidePlaces.length - 1 : current - 1
+    );
+  };
+
   return (
     <section className="section guide-section" id="guide">
       <div className="guide-heading">
         <div>
           <p className="eyebrow">Parents Guide (WIP)</p>
           <h2>Places reviewed for the things parents actually notice.</h2>
-          <p>Not “is the coffee nice?” More “can I survive here with a baby, a pram, and a bag full of emergency cloths?”</p>
+          <p>
+            Not “is the coffee nice?” More “can I survive here with a baby, a
+            pram, and a bag full of emergency cloths?”
+          </p>
         </div>
+
         <div className="legend">
-          {trafficLegend.map(([status, title, note]) => (
-            <div key={status}><span className={`dot ${status}`} /> <strong>{title}</strong><small>{note}</small></div>
-          ))}
+          <div><span className="dot easy" /> <strong>No problem</strong><small>Low parent energy required.</small></div>
+          <div><span className="dot effort" /> <strong>With energy</strong><small>Possible, but plan before entering or take help.</small></div>
+          <div><span className="dot avoid" /> <strong>Just no</strong><small>Technically possible does not count.</small></div>
         </div>
       </div>
 
-      <article className="review-card">
-        <div className="review-header">
-          <div>
-            <h3>{place.name}</h3>
-            <p>{place.area}</p>
+      <div className="review-deck">
+        {guidePlaces.length > 1 && (
+          <>
+            <div className="deck-card ghost ghost-one" />
+            <div className="deck-card ghost ghost-two" />
+          </>
+        )}
+
+        <article className="review-card active-review-card" key={place.name}>
+          <div className="review-header">
+            <div>
+              <h3>{place.name}</h3>
+              <p>{place.area}</p>
+            </div>
+            <span className="badge">{place.mode}</span>
           </div>
-          <span className="badge">Infant mode</span>
-        </div>
-        <p className="review-summary">{place.summary}</p>
-        <div className="facility-grid">
-          <Facility icon={<Droplets />} label="Toilets" value={place.facilities.toilets} />
-          <Facility icon={<Baby />} label="Changing" value={place.facilities.changing} />
-          <Facility icon={<Armchair />} label="High chairs" value={place.facilities.highChairs} />
-          <Facility icon={<Milk />} label="Bottle support" value={place.facilities.hotWater} />
-        </div>
-        <div className="ratings-grid">
-          {place.ratings.map((rating) => <Rating key={rating.label} {...rating} />)}
-        </div>
-      </article>
+
+          <p className="review-summary">{place.summary}</p>
+
+          <div className="facility-grid">
+            <Facility icon={<Droplets />} label="Toilets" value={place.facilities.toilets} />
+            <Facility icon={<Baby />} label="Changing" value={place.facilities.changing} />
+            <Facility icon={<Armchair />} label="High chairs" value={place.facilities.highChairs} />
+            <Facility icon={<Milk />} label="Bottle support" value={place.facilities.hotWater} />
+          </div>
+
+          <div className="ratings-grid">
+            {place.ratings.map((rating) => (
+              <Rating key={rating.label} {...rating} />
+            ))}
+          </div>
+        </article>
+      </div>
+
+      <div className="deck-controls">
+        <button className="button secondary" onClick={previousPlace} disabled={guidePlaces.length <= 1}>
+          Previous
+        </button>
+        <span>
+          {activeIndex + 1} / {guidePlaces.length}
+        </span>
+        <button className="button primary" onClick={nextPlace} disabled={guidePlaces.length <= 1}>
+          Next
+        </button>
+      </div>
     </section>
   );
 }
@@ -167,11 +181,14 @@ function Facility({ icon, label, value }) {
   return <div className="facility"><div className="facility-icon">{icon}</div><div><strong>{label}</strong><p>{value}</p></div></div>;
 }
 
-function Rating({ icon, label, status, title, note }) {
+function Rating({ icon, label, verdict, title, note }) {
   return (
-    <div className={`rating ${status}`}>
-      <div className="rating-top"><span>{icon}</span><strong>{label}</strong></div>
-      <h4>{title}</h4>
+    <div className={`rating ${verdict}`}>
+      <div className="rating-top">
+        <span>{icon}</span>
+        <strong>{label}</strong>
+      </div>
+      <span className={`verdict-pill ${verdict}`}>{title}</span>
       <p>{note}</p>
     </div>
   );
